@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Information</title>
+</head>
+<body>
+    {% if data.lyrics_info %}
+        <h2>Lyrics for {{ data.lyrics_info.track_name }} by {{ data.lyrics_info.artist_name }}</h2>
+        <p>{{ data.lyrics_info.lyrics }}</p>
+    {% endif %}
+    
+    <h2>Related Tracks</h2>
+    {% for track in data.related_tracks %}
+        <p>{{ track.name }} by {{ track.artists }}</p>
+    {% endfor %}
+
+    <h2>Top Tracks</h2>
+    {% for track in data.top_tracks %}
+        <p>{{ track.name }} - Popularity: {{ track.popularity }}</p>
+    {% endfor %}
+
+    <h2>Related Artists</h2>
+    {% for artist in data.related_artists %}
+        <p>{{ artist.name }} - Popularity: {{ artist.popularity }}</p>
+    {% endfor %}
+</body>
+</html>
+
