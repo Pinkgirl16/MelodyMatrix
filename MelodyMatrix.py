@@ -49,15 +49,18 @@ def get_related_info(input_name):
         lyrics = fetch_lyrics(track_name, artist_names)
         track_data.append((track_name, artist_names, lyrics))
 
-        # Fetch and write related tracks and their lyrics
-        related_tracks = sp.recommendations(seed_tracks=[track_id], limit=50)['tracks']
-        for related_track in related_tracks:
-            related_track_name = related_track['name']
-            related_artist_names = ', '.join(artist['name'] for artist in related_track['artists'])
-            related_lyrics = fetch_lyrics(related_track_name, related_artist_names)
-            track_data.append((related_track_name, related_artist_names, related_lyrics))
+        with open('track_lyrics.csv', 'w', newline='', encoding='utf-8', errors='replace') as file:
+            writer = csv.writer(file, quoting=csv.QUOTE_ALL, escapechar='\\')
+            writer.writerow(['Track Name', 'Artist Names', 'Lyrics'])
+            writer.writerow([track_name, artist_names, lyrics])
 
-        # Fetch related artists based on the main track's artists
+            related_tracks = sp.recommendations(seed_tracks=[track_id], limit=50)['tracks']
+            for related_track in related_tracks:
+                related_track_name = related_track['name']
+                related_artist_names = ', '.join(artist['name'] for artist in related_track['artists'])
+                related_lyrics = fetch_lyrics(related_track_name, related_artist_names)
+                writer.writerow([related_track_name, related_artist_names, related_lyrics])
+
         for artist_id in artist_ids:
             related_artists = sp.artist_related_artists(artist_id)['artists']
             for artist in related_artists:
