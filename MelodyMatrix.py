@@ -3,15 +3,29 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import lyricsgenius
 import csv
 import re
+
+from flask import Flask, request, render_template
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+
+app = Flask(__name__)
 auth_manager = SpotifyClientCredentials(client_id="c389e6ff9ac847578d6ef13170394d33", client_secret="d96fc96fb1b3462b85d06aa63bac2c1c")
 sp = Spotify(auth_manager=auth_manager)
 genius = lyricsgenius.Genius("uX8DuZ_OeCJqTtz1f_zuW_Q9UNNORmcRxiq9nCBe-A64dK92Da6jmbLqM-aJcXs5", timeout=15, retries=3)
 genius.verbose = False
 genius.remove_section_headers = True
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        input_name = request.form['input_name']
+        data = get_related_info(input_name)
+        print_top_similar_songs()
+    return render_template('index.html')
+
+
 
 def fetch_lyrics(track_name, artist_name):
     """ Attempt to fetch lyrics from Genius and clean them from brackets. """
@@ -23,6 +37,7 @@ def fetch_lyrics(track_name, artist_name):
     except Exception as e:
         print(f"Error fetching lyrics for {track_name}: {e}")
     return "Lyrics not found."
+
 
 def get_related_info(input_name):
     track_results = sp.search(q=f"track:{input_name}", type='track', limit=1)
@@ -62,10 +77,13 @@ def print_top_similar_songs():
         idx = sorted_indices[i]
         print(f"{i+1}. {df.iloc[idx]['Track Name']} by {df.iloc[idx]['Artist Names']} - Similarity: {similarities[idx]:.4f}")
 
+
 def main():
     input_name = input("Enter the name of a track or an artist: ")
     get_related_info(input_name)
     print_top_similar_songs()
 
 if __name__ == "__main__":
+    app.run(debug=True)
     main()
+
