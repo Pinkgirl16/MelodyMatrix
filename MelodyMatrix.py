@@ -3,18 +3,17 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import lyricsgenius
 import csv
 import re
+
 from flask import Flask, request, render_template
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-
 app = Flask(__name__)
-
 auth_manager = SpotifyClientCredentials(client_id="c389e6ff9ac847578d6ef13170394d33", client_secret="d96fc96fb1b3462b85d06aa63bac2c1c")
 sp = Spotify(auth_manager=auth_manager)
-genius = lyricsgenius.Genius("uX8DuZ_OeCJqTtz1f_zuW_Q9UNNORmcRxiq9nCBe-A64dK92Da6jmbLqM-aJcXs5",timeout=15, retries=3)
+genius = lyricsgenius.Genius("uX8DuZ_OeCJqTtz1f_zuW_Q9UNNORmcRxiq9nCBe-A64dK92Da6jmbLqM-aJcXs5", timeout=15, retries=3)
 genius.verbose = False
 genius.remove_section_headers = True
 
@@ -29,14 +28,14 @@ def index():
 
 
 def fetch_lyrics(track_name, artist_name):
-    """ Fetch and clean lyrics using the Genius API with error handling """
+    """ Attempt to fetch lyrics from Genius and clean them from brackets. """
     try:
         song = genius.search_song(track_name, artist_name)
         if song and song.lyrics:
             lyrics = re.sub(r'\[.*?\]', '', song.lyrics)
             return lyrics.strip()
     except Exception as e:
-        print(f"Error fetching lyrics: {e}")
+        print(f"Error fetching lyrics for {track_name}: {e}")
     return "Lyrics not found."
 
 
@@ -86,3 +85,5 @@ def main():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    main()
+
