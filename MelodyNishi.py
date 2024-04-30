@@ -23,8 +23,8 @@ def fetch_lyrics(track_name, artist_name):
         print(f"Error fetching lyrics for {track_name}: {e}")
     return "Lyrics not found."
 
-def get_related_info(input_name):
-    track_results = sp.search(q=f"track:{input_name}", type='track', limit=1)
+def get_related_info(input_track_name, input_artist_name):
+    track_results = sp.search(q=f"track:{input_track_name} artist:{input_artist_name}", type='track', limit=1)
     related_artists_info = []
 
     with open('track_lyrics.csv', 'w', newline='', encoding='utf-8') as file:
@@ -47,7 +47,6 @@ def get_related_info(input_name):
                 related_lyrics = fetch_lyrics(related_track_name, related_artist_name)
                 writer.writerow([related_track_name, related_artist_name, related_lyrics])
 
-            # Fetch related artists
             for artist_id in artist_ids:
                 related_artists = sp.artist_related_artists(artist_id)['artists']
                 top_related_artists = related_artists[:10]  # Limit to top 10 related artists
@@ -78,8 +77,9 @@ def print_top_similar_songs():
         print(f"{i+1}. {df.iloc[idx]['Track Name']} by {df.iloc[idx]['Artist Names']} - Similarity: {similarities[idx]:.4f}")
 
 def main():
-    input_name = input("Enter the name of a track: ")
-    get_related_info(input_name)
+    input_track_name = input("Enter the name of a track: ")
+    input_artist_name = input("Enter the name of the artist: ")
+    get_related_info(input_track_name, input_artist_name)
     print_top_similar_songs()
 
 if __name__ == "__main__":
